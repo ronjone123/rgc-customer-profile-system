@@ -7,6 +7,32 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 
+# RGC Customer Profile System (Backend)
+
+Role-based, branch-aware customer profiling system for a motorcycle & appliances business.
+
+## Tech Stack
+- Laravel 12 / PHP 8.2
+- MySQL
+- Blade + Tailwind
+- Custom middleware (no Spatie)
+
+## Roles
+- **superadmin**: full system control
+- **head_admin**: global admin (not tied to a branch)
+- **branch_admin**: scoped to a single branch
+- **user**: creates customer profiles (scoped to a branch)
+
+## Migration Safety Checklist (MANDATORY)
+
+> Rule: never run a migration without a Git checkpoint + DB backup.
+
+### Before you run migrations
+1. **Confirm working tree is clean**
+   ```bash
+   git status
+
+
 ## About Laravel
 
 Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
