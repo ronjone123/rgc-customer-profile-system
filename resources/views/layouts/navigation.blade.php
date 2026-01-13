@@ -1,3 +1,16 @@
+@php
+    use App\Models\User;
+
+    $user = auth()->user();
+
+    $homeRoute = match ($user?->role) {
+        User::ROLE_SUPERADMIN   => route('superadmin.dashboard'),
+        User::ROLE_HEAD_ADMIN   => route('admin.dashboard'),
+        User::ROLE_BRANCH_ADMIN => route('branch.dashboard'),
+        default                 => route('user.customers.index'),
+    };
+@endphp
+
 <nav x-data="{ open: false }" class="bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700">
     <!-- Primary Navigation Menu -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -5,16 +18,78 @@
             <div class="flex">
                 <!-- Logo -->
                 <div class="shrink-0 flex items-center">
-                    <a href="{{ route('dashboard') }}">
+                    <a href="{{ $homeRoute }}">
                         <x-application-logo class="block h-9 w-auto fill-current text-gray-800 dark:text-gray-200" />
                     </a>
                 </div>
 
-                <!-- Navigation Links -->
+                <!-- Navigation Links (Desktop) -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                        {{ __('Dashboard') }}
-                    </x-nav-link>
+
+                    {{-- SUPERADMIN --}}
+                    @if ($user->role === User::ROLE_SUPERADMIN)
+                        <x-nav-link :href="route('superadmin.dashboard')" :active="request()->routeIs('superadmin.dashboard')">
+                            Dashboard
+                        </x-nav-link>
+
+                        <x-nav-link :href="route('superadmin.admins.index')" :active="request()->routeIs('superadmin.admins.*')">
+                            Admins
+                        </x-nav-link>
+
+                        <x-nav-link :href="route('superadmin.branches.index')" :active="request()->routeIs('superadmin.branches.*')">
+                            Branches
+                        </x-nav-link>
+
+                        <x-nav-link :href="route('superadmin.users.index')" :active="request()->routeIs('superadmin.users.*')">
+                            Users
+                        </x-nav-link>
+                    @endif
+
+                    {{-- HEAD OFFICE ADMIN --}}
+                    @if ($user->role === User::ROLE_HEAD_ADMIN)
+                        <x-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')">
+                            Dashboard
+                        </x-nav-link>
+
+                        <x-nav-link :href="route('admin.customers.index')" :active="request()->routeIs('admin.customers.*')">
+                            Customers
+                        </x-nav-link>
+
+                        <x-nav-link :href="route('admin.audits.index')" :active="request()->routeIs('admin.audits.*')">
+                            Audit Logs
+                        </x-nav-link>
+                    @endif
+
+                    {{-- BRANCH ADMIN --}}
+                    @if ($user->role === User::ROLE_BRANCH_ADMIN)
+                        <x-nav-link :href="route('branch.dashboard')" :active="request()->routeIs('branch.dashboard')">
+                            Dashboard
+                        </x-nav-link>
+
+                        <x-nav-link :href="route('branch.customers.index')" :active="request()->routeIs('branch.customers.*')">
+                            Customers
+                        </x-nav-link>
+
+                        <x-nav-link :href="route('branch.users.index')" :active="request()->routeIs('branch.users.*')">
+                            Users
+                        </x-nav-link>
+
+                        <x-nav-link :href="route('branch.audits.index')" :active="request()->routeIs('branch.audits.*')">
+                            Audit Logs
+                        </x-nav-link>
+                    @endif
+
+                    {{-- USER (ENCODER) --}}
+                    @if ($user->role === User::ROLE_USER)
+                        <x-nav-link :href="route('user.customers.index')" :active="request()->routeIs('user.customers.*')">
+                            Customers
+                        </x-nav-link>
+
+                        <x-nav-link :href="route('user.customers.create')" :active="request()->routeIs('user.customers.create')">
+                            New Customer
+                        </x-nav-link>
+                    @endif
+
                 </div>
             </div>
 
@@ -38,13 +113,10 @@
                             {{ __('Profile') }}
                         </x-dropdown-link>
 
-                        <!-- Authentication -->
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
-
                             <x-dropdown-link :href="route('logout')"
-                                    onclick="event.preventDefault();
-                                                this.closest('form').submit();">
+                                onclick="event.preventDefault(); this.closest('form').submit();">
                                 {{ __('Log Out') }}
                             </x-dropdown-link>
                         </form>
@@ -64,12 +136,65 @@
         </div>
     </div>
 
-    <!-- Responsive Navigation Menu -->
+    <!-- Responsive Navigation Menu (Mobile) -->
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
-            <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                {{ __('Dashboard') }}
-            </x-responsive-nav-link>
+
+            {{-- SUPERADMIN --}}
+            @if ($user->role === User::ROLE_SUPERADMIN)
+                <x-responsive-nav-link :href="route('superadmin.dashboard')" :active="request()->routeIs('superadmin.dashboard')">
+                    Dashboard
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('superadmin.admins.index')" :active="request()->routeIs('superadmin.admins.*')">
+                    Admins
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('superadmin.branches.index')" :active="request()->routeIs('superadmin.branches.*')">
+                    Branches
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('superadmin.users.index')" :active="request()->routeIs('superadmin.users.*')">
+                    Users
+                </x-responsive-nav-link>
+            @endif
+
+            {{-- HEAD OFFICE ADMIN --}}
+            @if ($user->role === User::ROLE_HEAD_ADMIN)
+                <x-responsive-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')">
+                    Dashboard
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('admin.customers.index')" :active="request()->routeIs('admin.customers.*')">
+                    Customers
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('admin.audits.index')" :active="request()->routeIs('admin.audits.*')">
+                    Audit Logs
+                </x-responsive-nav-link>
+            @endif
+
+            {{-- BRANCH ADMIN --}}
+            @if ($user->role === User::ROLE_BRANCH_ADMIN)
+                <x-responsive-nav-link :href="route('branch.dashboard')" :active="request()->routeIs('branch.dashboard')">
+                    Dashboard
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('branch.customers.index')" :active="request()->routeIs('branch.customers.*')">
+                    Customers
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('branch.users.index')" :active="request()->routeIs('branch.users.*')">
+                    Users
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('branch.audits.index')" :active="request()->routeIs('branch.audits.*')">
+                    Audit Logs
+                </x-responsive-nav-link>
+            @endif
+
+            {{-- USER (ENCODER) --}}
+            @if ($user->role === User::ROLE_USER)
+                <x-responsive-nav-link :href="route('user.customers.index')" :active="request()->routeIs('user.customers.*')">
+                    Customers
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('user.customers.create')" :active="request()->routeIs('user.customers.create')">
+                    New Customer
+                </x-responsive-nav-link>
+            @endif
+
         </div>
 
         <!-- Responsive Settings Options -->
@@ -84,13 +209,10 @@
                     {{ __('Profile') }}
                 </x-responsive-nav-link>
 
-                <!-- Authentication -->
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
-
                     <x-responsive-nav-link :href="route('logout')"
-                            onclick="event.preventDefault();
-                                        this.closest('form').submit();">
+                        onclick="event.preventDefault(); this.closest('form').submit();">
                         {{ __('Log Out') }}
                     </x-responsive-nav-link>
                 </form>
